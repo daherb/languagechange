@@ -22,7 +22,7 @@ class CacheManager:
             cache_dir (str, optional): The directory where cache files will be stored. 
                                        Defaults to './cache' if not provided.
         """
-        self.cache_dir = os.path.abspath(cache_dir or DEFAULT_CACHE_DIR)
+        self.cache_dir = os.path.abspath(os.path.expanduser(cache_dir or DEFAULT_CACHE_DIR))
         os.makedirs(self.cache_dir, exist_ok=True)
 
     @contextmanager

@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "languagechange"
+version = "0.0.1"
+authors = [{name = "Change is Key!"}]
+description = "Python Library for Language Change"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "sortedcontainers",
+    "bs4",
+    "lxml",
+    "gensim @ git+https://github.com/piskvorky/gensim",
+    "torch",
+    "torchvision",
+    "torchaudio",
+    "trankit @ git+https://github.com/looi/trankit.git",
+    "openai",
+    "langchain",
+    "pydantic",
+    "LSCDetection @ git+https://github.com/daherb/LSCDetection.git",
+    "WordTransformer @ git+https://github.com/daherb/xl-lexeme.git",
+    "dload",
+    "platformdirs",
+    "jsonlines",
+    "peft",
+    "datasets",
+]
+
+[project.readme]
+file = "setup.cfg"
+content-type = "text/markdown"
+
+[project.urls]
+Homepage = "https://github.com/daherb/languagechange"
+
+[tool.setuptools]
+platforms = ["all"]
+include-package-data = false
+
+[tool.setuptools.packages]
+find = {namespaces = false}

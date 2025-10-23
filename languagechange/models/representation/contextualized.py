@@ -8,16 +8,12 @@ from languagechange.cache import CacheManager
 import transformers
 from transformers import AutoTokenizer, AutoModel
 from WordTransformer import WordTransformer, InputExample
-import logging
 import hashlib
 import pickle
 import os
 
-# Configure logging with a basic setup
-logging.basicConfig(
-    level=logging.INFO, 
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+import languagechange.logging
+
 logger = logging.getLogger(__name__)
 
 

@@ -10,7 +10,6 @@ from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
 from languagechange.usages import TargetUsage
 from pydantic import BaseModel, Field
-import logging
 from typing import Tuple, List, Union, Any
 import csv
 from os import path
@@ -20,6 +19,8 @@ import tqdm
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 from sentence_transformers import SentenceTransformer
 import getpass
+
+import languagechange.logging
 
 # Define types for chat dialog outside the class for clarity
 Role = Literal["system", "user"]
@@ -442,7 +443,6 @@ class T5DefinitionGenerator(DefinitionGenerator):
         """
         super().__init__()
         self.logger = logging.getLogger(__name__)
-        logging.basicConfig(format="%(asctime)s : %(levelname)s : %(message)s", level=logging.INFO)
 
         self.model_path = model_path
         self.name = "T5DefinitionGenerator_" + self.model_path

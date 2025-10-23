@@ -1,6 +1,6 @@
 import bz2
 import gzip
-import logging
+import languagechange.logging
 import os
 import re
 from typing import List, Pattern, Self, Union
@@ -12,9 +12,6 @@ from languagechange.search import SearchTerm
 from languagechange.usages import TargetUsage, TargetUsageList, UsageDictionary
 from languagechange.utils import LiteralTime
 from sortedcontainers import SortedKeyList
-
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-
 
 class Line:
 

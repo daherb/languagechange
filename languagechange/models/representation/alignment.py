@@ -14,7 +14,7 @@ import re
 import sys
 import collections
 import time
-import logging
+import languagechange.logging
 
 
 class OrthogonalProcrustes():
@@ -106,7 +106,6 @@ class OrthogonalProcrustes():
         #    self.savepath1,
         #    self.savepath2])    
 
-        logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
         logging.info(__file__.upper())
         start_time = time.time()
 

@@ -2,7 +2,7 @@ from languagechange.usages import TargetUsage
 from typing import List, Union
 from sentence_transformers import CrossEncoder
 import numpy as np
-import logging
+import languagechange.logging
 
 class ChangeTypeClassifier:
 

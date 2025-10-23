@@ -5,9 +5,9 @@ import os
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chat_models import init_chat_model
 from pydantic import BaseModel, Field
-import logging
 import trankit
 
+import languagechange.logging
 
 class SCFloat(BaseModel):
     change : float = Field(description='The semantic change on a scale from 0 to 1.',le=1, ge=0)

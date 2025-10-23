@@ -1,6 +1,6 @@
 import enum
 import pickle
-import logging
+import languagechange.logging
 import os
 import re
 

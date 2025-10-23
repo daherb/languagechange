@@ -4,13 +4,8 @@ import urllib.request
 from pathlib import Path
 from platformdirs import user_cache_dir
 import dload
-import logging
+import languagechange.logging
 
-# Configure logging with a basic setup
-logging.basicConfig(
-    level=logging.INFO, 
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
 logger = logging.getLogger(__name__)
 
 class LanguageChange():

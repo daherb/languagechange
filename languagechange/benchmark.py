@@ -10,7 +10,7 @@ import os
 import pickle
 import json
 from itertools import islice
-import logging
+import languagechange.logging
 import re
 import zipfile
 import random

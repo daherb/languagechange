@@ -7,21 +7,17 @@ from languagechange.corpora import LinebyLineCorpus
 from LSCDetection.modules.utils_ import Space
 import os
 from collections import defaultdict
-import logging
 import time
 from scipy.sparse import dok_matrix
 from gensim.models.word2vec import PathLineSentences
 from sklearn.utils.extmath import randomized_svd
 from sklearn.random_projection import SparseRandomProjection
 from scipy.sparse import csr_matrix
-env = os.environ.copy()
-import logging
 
-# Configure logging with a basic setup
-logging.basicConfig(
-    level=logging.INFO, 
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+import languagechange.logging
+
+env = os.environ.copy()
+
 logger = logging.getLogger(__name__)
 
 

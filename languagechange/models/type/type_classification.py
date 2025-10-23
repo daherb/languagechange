@@ -3,6 +3,7 @@ from typing import List, Union
 from sentence_transformers import CrossEncoder
 import numpy as np
 import languagechange.logging
+from languagechange.logging import logging
 
 class ChangeTypeClassifier:
 

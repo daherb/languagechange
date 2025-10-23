@@ -21,6 +21,7 @@ from sentence_transformers import SentenceTransformer
 import getpass
 
 import languagechange.logging
+from languagechange.logging import logging
 
 # Define types for chat dialog outside the class for clarity
 Role = Literal["system", "user"]

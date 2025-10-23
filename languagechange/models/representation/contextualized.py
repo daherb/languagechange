@@ -13,6 +13,7 @@ import pickle
 import os
 
 import languagechange.logging
+from languagechange.logging import logging
 
 logger = logging.getLogger(__name__)
 

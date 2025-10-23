@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 import trankit
 
 import languagechange.logging
+from languagechange.logging import logging
 
 class SCFloat(BaseModel):
     change : float = Field(description='The semantic change on a scale from 0 to 1.',le=1, ge=0)

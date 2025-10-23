@@ -10,7 +10,6 @@ import os
 import pickle
 import json
 from itertools import islice
-import languagechange.logging
 import re
 import zipfile
 import random
@@ -23,6 +22,8 @@ import lxml.etree as ET
 from typing import List, Dict, Union, Callable, Tuple
 import inspect
 
+import languagechange.logging
+from languagechange.logging import logging
 
 def purity(labels_true, cluster_labels):
     assert len(labels_true) == len(cluster_labels)

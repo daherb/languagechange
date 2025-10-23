@@ -1,6 +1,5 @@
 import bz2
 import gzip
-import languagechange.logging
 import os
 import re
 from typing import List, Pattern, Self, Union
@@ -12,6 +11,9 @@ from languagechange.search import SearchTerm
 from languagechange.usages import TargetUsage, TargetUsageList, UsageDictionary
 from languagechange.utils import LiteralTime
 from sortedcontainers import SortedKeyList
+
+import languagechange.logging
+from languagechange.logging import logging
 
 class Line:
 

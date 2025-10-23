@@ -15,6 +15,7 @@ from sklearn.random_projection import SparseRandomProjection
 from scipy.sparse import csr_matrix
 
 import languagechange.logging
+from languagechange.logging import logging
 
 env = os.environ.copy()
 

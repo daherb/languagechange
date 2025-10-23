@@ -1,6 +1,5 @@
 import enum
 import pickle
-import languagechange.logging
 import os
 import re
 
@@ -10,6 +9,8 @@ from pathlib import Path
 
 from languagechange.utils import Time
 
+import languagechange.logging
+from languagechange.logging import logging
 
 class POS(enum.Enum):
    NOUN = 1

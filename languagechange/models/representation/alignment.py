@@ -15,7 +15,7 @@ import sys
 import collections
 import time
 import languagechange.logging
-
+from languagechange.logging import logging
 
 class OrthogonalProcrustes():
     """

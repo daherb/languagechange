@@ -616,14 +616,14 @@ class LinebyLineCorpus(Corpus):
 
         for fname in fnames:
 
-            if fname.endswith('.txt'):
+            if str(fname).endswith('.txt'):
                 with open(fname,'r') as f:
                     for i, line in enumerate(f):
                         if i >= self.skip_lines:
                             data = get_data(line)
                             yield Line(fname=fname, **data)
 
-            elif fname.endswith('.gz'):
+            elif str(fname).endswith('.gz'):
                 with gzip.open(fname, mode="rt") as f:
                     for i, line in enumerate(f):
                         if i >= self.skip_lines:
@@ -666,7 +666,7 @@ class VerticalCorpus(Corpus):
 
         for fname in fnames:
 
-            if fname.endswith('.txt'):
+            if str(fname).endswith('.txt'):
                 with open(fname,'r') as f:
                     line = []
                     for i, vertical_line in enumerate(f):
@@ -678,7 +678,7 @@ class VerticalCorpus(Corpus):
                             else:
                                 line.append(vertical_line)
 
-            elif fname.endswith('.gz'):
+            elif str(fname).endswith('.gz'):
                 with gzip.open(fname, mode="rt") as f:
                     for i, vertical_line in enumerate(f):
                         if i >= self.skip_lines:
@@ -799,10 +799,10 @@ class XMLCorpus(Corpus):
 
 
         for fname in fnames:
-            if fname.endswith('.xml'):
+            if str(fname).endswith('.xml'):
                 for l in read_xml(fname):
                     yield l
-            elif fname.endswith('.xml.bz2'):
+            elif str(fname).endswith('.xml.bz2'):
                 with bz2.open(fname, 'r') as f:
                     for l in read_xml(f):
                         yield l

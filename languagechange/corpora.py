@@ -13,7 +13,8 @@ from languagechange.utils import LiteralTime
 from sortedcontainers import SortedKeyList
 
 import languagechange.logging
-from languagechange.logging import logging
+
+logger= languagechange.logging.logging.getLogger(__name__)
 
 class Line:
 
@@ -171,7 +172,7 @@ class Corpus:
                 match : List[TargetUsage] = line.search(st, time = self.time)
                 tul.extend(match)
                 n_usages += len(match)
-        logging.info(f"{n_usages} usages found.")
+        logger.info(f"{n_usages} usages found.")
         return usage_dictionary
 
     def tokenize(self, tokenizer = "trankit", split_sentences=False, batch_size=128):
@@ -218,7 +219,7 @@ class Corpus:
                             line._tokens = [str(token) for token in tokenizer(text)]
                             yield line
                 except Exception:
-                    logging.error(f"Could not use tokenizer {tokenizer} directly as a function to tokenize.")
+                    logger.error(f"Could not use tokenizer {tokenizer} directly as a function to tokenize.")
 
     def lemmatize(self, lemmatizer = "trankit", pretokenized = False, tokenize = False, split_sentences = False, batch_size=128):
         if lemmatizer == "trankit":
@@ -302,7 +303,7 @@ class Corpus:
                                 line._lemmas = [str(lemma) for lemma in lemmatizer(text)]
                                 yield line
                 except Exception:
-                    logging.error(f"Could not use method {lemmatizer} directly as a function to lemmatize.")
+                    logger.error(f"Could not use method {lemmatizer} directly as a function to lemmatize.")
 
     def pos_tagging(self, pos_tagger = "trankit", pretokenized = False, tokenize=False, split_sentences = False, batch_size=128):
         if pos_tagger == "trankit":
@@ -384,7 +385,7 @@ class Corpus:
                                 line._pos_tags = [str(pos_tag) for pos_tag in pos_tagger(text)]
                                 yield line
                 except Exception:
-                    logging.error(f"Could not use method {pos_tagger} directly as a function to perform POS tagging.")
+                    logger.error(f"Could not use method {pos_tagger} directly as a function to perform POS tagging.")
 
     def tokens_lemmas_pos_tags(self, nlp_model="trankit", tokens=True, split_sentences = False, batch_size=128):
         if nlp_model == "trankit":
@@ -461,7 +462,7 @@ class Corpus:
                     for sent in sentences:
                         yield Line(sent)
             except:
-                logging.info(f"ERROR: Could not use method {segmentizer} directly as a function to split sentences.")
+                logger.info(f"ERROR: Could not use method {segmentizer} directly as a function to split sentences.")
 
 
     def folder_iterator(self, path):
@@ -819,7 +820,7 @@ class XMLCorpus(Corpus):
         tokenized = linebyline_corpus.is_tokenized
         lemmatized = linebyline_corpus.is_lemmatized
         if lemmatized and not self.is_lemmatized:
-            logging.info('ERROR: cannot cast to lemmatized LinebyLineCorpus because this XMLCorpus is not lemmatized.')
+            logger.info('ERROR: cannot cast to lemmatized LinebyLineCorpus because this XMLCorpus is not lemmatized.')
             return None
         with open(savepath, 'w+') as f:
             if lemmatized:
@@ -887,7 +888,7 @@ class HistoricalCorpus(SortedKeyList):
         if isinstance(corpora, str):
             try:
                 if corpus_type not in ['line_by_line','vertical','xml','sprakbanken']:
-                    logging.error("When initialising from a folder path, corpus_type must be one of 'line_by_line','vertical','xml' and 'sprakbanken'.")
+                    logger.error("When initialising from a folder path, corpus_type must be one of 'line_by_line','vertical','xml' and 'sprakbanken'.")
                     raise ValueError
                 corpora_list = []
                 for file in os.listdir(corpora):
@@ -902,19 +903,19 @@ class HistoricalCorpus(SortedKeyList):
                             corpus = SprakBankenCorpus(os.path.join(corpora,file),time_function=time_function)
                         corpora_list.append(corpus)
                     except: #TODO: proper exception
-                        logging.error(f"Could not initialise a corpus from path {os.path.join(dir,file)}.")
+                        logger.error(f"Could not initialise a corpus from path {os.path.join(dir,file)}.")
                         continue
                 corpora = corpora_list
             except:
-                logging.error(f"Could not use path {corpora} to intitialize corpora.")
+                logger.error(f"Could not use path {corpora} to intitialize corpora.")
                 raise Exception
         elif isinstance(corpora, list):
             for corpus in corpora:
                 if not isinstance(corpus, Corpus):
-                    logging.error("Every element in 'corpora' needs to be a Corpus object.")
+                    logger.error("Every element in 'corpora' needs to be a Corpus object.")
                     raise Exception
         else:
-            logging.error("'corpora' needs to be either a string or a list of Corpus objects.")
+            logger.error("'corpora' needs to be either a string or a list of Corpus objects.")
             raise Exception
         super().__init__(corpora, key)
 
@@ -927,7 +928,7 @@ class HistoricalCorpus(SortedKeyList):
                 for line in corpus.line_iterator():
                     yield line
             except:
-                logging.error(f"Could not get lines from {corpus.name}.")
+                logger.error(f"Could not get lines from {corpus.name}.")
 
     def search(self, search_terms : List[ str | Pattern | SearchTerm ], index_by_corpus=False):
         """
@@ -952,7 +953,7 @@ class HistoricalCorpus(SortedKeyList):
                 try:
                     usage_dict : UsageDictionary = corpus.search(search_terms)
                 except:
-                    logging.error(f"Could not search through {corpus.name}.")
+                    logger.error(f"Could not search through {corpus.name}.")
                     continue
                 for key in usage_dict:
                     if not key in usages:
@@ -965,7 +966,7 @@ class HistoricalCorpus(SortedKeyList):
                 try:
                     usage_dict : UsageDictionary = corpus.search(search_terms)
                 except:
-                    logging.error(f"Could not search through {corpus.name}.")
+                    logger.error(f"Could not search through {corpus.name}.")
                     continue
                 for key in usage_dict:
                     if not key in usages:

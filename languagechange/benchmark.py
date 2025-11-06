@@ -23,7 +23,8 @@ from typing import List, Dict, Union, Callable, Tuple
 import inspect
 
 import languagechange.logging
-from languagechange.logging import logging
+
+logger= languagechange.logging.logging.getLogger(__name__)
 
 def purity(labels_true, cluster_labels):
     assert len(labels_true) == len(cluster_labels)
@@ -57,19 +58,19 @@ class Benchmark():
         if 'train' in self.data.keys():
             return self.data['train']
         else:
-            logging.info('Did not find a train set. Returning None')
+            logger.info('Did not find a train set. Returning None')
     
     def get_dev(self):
         if 'dev' in self.data.keys():
             return self.data['dev']
         else:
-            logging.info('Did not find a dev set. Returning None')
+            logger.info('Did not find a dev set. Returning None')
     
     def get_test(self):
         if 'test' in self.data.keys():
             return self.data['test']
         else:
-            logging.info('Did not find a test set. Returning None')
+            logger.info('Did not find a test set. Returning None')
     
     def get_all_data(self):
         if 'all' in self.data.keys():
@@ -83,7 +84,7 @@ class Benchmark():
     def split_train_dev_test(self, train_prop = 0.8, dev_prop = 0.1, test_prop = 0.1, shuffle = True, epsilon = 1e-6):
         for s in ['train','dev','test']:
             if s in self.data.keys():
-                logging.info(f'Dataset already contains a {s} set.')
+                logger.info(f'Dataset already contains a {s} set.')
         if not 'all' in self.data.keys():
             data = []
             for k in set(self.data.keys()).difference({'all'}):
@@ -94,7 +95,7 @@ class Benchmark():
         try:
             assert abs(1 - (train_prop + dev_prop + test_prop)) < epsilon
         except AssertionError:
-            logging.error('Train, dev and test proportions must add upp to 1.')
+            logger.error('Train, dev and test proportions must add upp to 1.')
             return None
 
         if shuffle:
@@ -160,7 +161,7 @@ class SemanticChangeEvaluationDataset(Benchmark):
                 (numpy.float64) An accuracy score: the percentage of correct predictions.
         """
         if self.binary_task == {}:
-            logging.error('The dataset does not contain binary change scores; nothing to evaluate on.')
+            logger.error('The dataset does not contain binary change scores; nothing to evaluate on.')
             return
 
         if type(predictions) == list:
@@ -182,7 +183,7 @@ class SemanticChangeEvaluationDataset(Benchmark):
                 (scipy.stats._stats_py.SignificanceResult[numpy.float64, numpy.float64]) The Spearman correlation (rho, p) between the predictions and the gold labels.
         """
         if self.graded_task == {}:
-            logging.error('The dataset does not contain graded change scores; nothing to evaluate on.')
+            logger.error('The dataset does not contain graded change scores; nothing to evaluate on.')
             return
         
         if type(predictions) == list:
@@ -358,7 +359,7 @@ class DWUG(SemanticChangeEvaluationDataset):
                         else:
                             keys = line
             except FileNotFoundError as e:
-                logging.info("Could not find a path to stats.csv. Did you enter the right config value?")
+                logger.info("Could not find a path to stats.csv. Did you enter the right config value?")
 
         self.binary_task = {}
         self.graded_task = {}
@@ -462,13 +463,13 @@ class DWUG(SemanticChangeEvaluationDataset):
                 elif metric.lower() == 'binary':
                     similarity_func = lambda e1, e2 : int(np.dot(e1, e2)/(np.linalg.norm(e1) * np.linalg.norm(e2)) > 0.5)
                 else:
-                    logging.error(f"Metric '{metric}' not recognized. Supported metrics are 'cosine', 'durel' and 'binary'.")
+                    logger.error(f"Metric '{metric}' not recognized. Supported metrics are 'cosine', 'durel' and 'binary'.")
                     raise ValueError
             elif callable(metric):
                 signature = inspect.signature(similarity_func)
                 n_req_args = sum([int(p.default == p.empty) for p in signature.parameters.values()])
                 if n_req_args != 2:
-                    logging.error(f"'label_func' must take 2 arguments but takes {n_req_args}.")
+                    logger.error(f"'label_func' must take 2 arguments but takes {n_req_args}.")
                     return None
                 similarity_func = metric
 
@@ -494,7 +495,7 @@ class DWUG(SemanticChangeEvaluationDataset):
                 ids = list(ids)
                 id1, id2 = ids[0], ids[1]
                 writer.writerow([id1, id2, type(model).__name__, similarity, word])
-            logging.info(f"Usages for {word} annotated by {type(model).__name__}.")
+            logger.info(f"Usages for {word} annotated by {type(model).__name__}.")
 
     def annotate_all_words(self, model, metric : str | Callable = None):
         """
@@ -532,7 +533,7 @@ class DWUG(SemanticChangeEvaluationDataset):
                         if int(label) == -1:
                             outliers.add(id)
         except Exception as e:
-            logging.error(f"Could not remove outlier usages of '{word}' due to the following error: {e}")
+            logger.error(f"Could not remove outlier usages of '{word}' due to the following error: {e}")
             raise e
         
         return outliers
@@ -587,7 +588,7 @@ class DWUG(SemanticChangeEvaluationDataset):
                             start, end = int(start), int(end)
                             usages_by_key[id] = {'word': lemma, 'text':context, 'start':start, 'end':end, 'grouping':grouping}
         except Exception as e:
-            logging.error(f"Could not load usage data for '{word}' due to the following error: {e}")
+            logger.error(f"Could not load usage data for '{word}' due to the following error: {e}")
             raise e
 
         temp_labels = {}
@@ -621,7 +622,7 @@ class DWUG(SemanticChangeEvaluationDataset):
                                     temp_labels[frozenset([id1,id2])] = []
                                 temp_labels[frozenset([id1,id2])].append(label)
         except Exception as e:
-            logging.error(f"Could not load judgment data for '{word}' due to the following error: {e}")
+            logger.error(f"Could not load judgment data for '{word}' due to the following error: {e}")
             raise e
 
         try:
@@ -639,7 +640,7 @@ class DWUG(SemanticChangeEvaluationDataset):
                     try:
                         label = transform_labels(temp_labels[key])
                     except:
-                        logging.error(f'{transform_labels} could not be used as a function to transform labels.')
+                        logger.error(f'{transform_labels} could not be used as a function to transform labels.')
                         raise ValueError
                 elif type(transform_labels) == str:
                     try:
@@ -648,7 +649,7 @@ class DWUG(SemanticChangeEvaluationDataset):
                         }
                         label = transform_funcs[transform_labels](temp_labels[key])
                     except KeyError:
-                        logging.error(f"{transform_labels} does not denote a function used to transform the list of labels into one label. Currently only 'mean' is supported.")
+                        logger.error(f"{transform_labels} does not denote a function used to transform the list of labels into one label. Currently only 'mean' is supported.")
                         raise KeyError
                     
                 judgments[frozenset([id1, id2])] = {'word': word, 
@@ -656,7 +657,7 @@ class DWUG(SemanticChangeEvaluationDataset):
                             'id2': id2, 'text2': usage2['text'], 'start2': usage2['start'], 'end2': usage2['end'],
                             'label': label}
         except Exception as e:
-            logging.error(f"Could not combine usage and judgment data for '{word}' due to the following error: {e}")
+            logger.error(f"Could not combine usage and judgment data for '{word}' due to the following error: {e}")
             raise e
         
         if return_list:
@@ -713,7 +714,7 @@ class DWUG(SemanticChangeEvaluationDataset):
                         except ValueError:
                             usages_by_id[id] = {'id': id, 'label': label}
             except Exception as e:
-                logging.error(f"Could not load sense labels for '{word}' due to the following error: {e}")
+                logger.error(f"Could not load sense labels for '{word}' due to the following error: {e}")
                 raise e
 
             try:
@@ -743,13 +744,13 @@ class DWUG(SemanticChangeEvaluationDataset):
                                 start, end = int(start), int(end)
                                 usages_by_id[id].update({'word': lemma, 'text':context, 'start':start, 'end':end, 'label': lemma + ":" + usages_by_id[id]['label']})
             except Exception as e:
-                logging.error(f"Could not load usages for '{word}' due to the following error: {e}")
+                logger.error(f"Could not load usages for '{word}' due to the following error: {e}")
                 raise e
             
             for id, ex in usages_by_id.items():
                 for k in {'text','start','end','word','label'}:
                     if not k in ex:
-                        logging.error(f"A value for {k} in missing in the example of id {id}. Make sure that {senses_path} and {os.path.join(self.home_path,'data',word,'uses.csv')} contain the same examples.")
+                        logger.error(f"A value for {k} in missing in the example of id {id}. Make sure that {senses_path} and {os.path.join(self.home_path,'data',word,'uses.csv')} contain the same examples.")
                         raise KeyError
             
             data.extend(list(usages_by_id.values()))
@@ -780,7 +781,7 @@ class DWUG(SemanticChangeEvaluationDataset):
                 (numpy.float64) An accuracy score: the percentage of correct predictions.
         """
         if self.binary_task == {}:
-            logging.error('DWUG does not contain binary change scores; nothing to evaluate on.')
+            logger.error('DWUG does not contain binary change scores; nothing to evaluate on.')
             return
 
         if type(predictions) == list:
@@ -802,7 +803,7 @@ class DWUG(SemanticChangeEvaluationDataset):
                 (scipy.stats._stats_py.SignificanceResult[numpy.float64, numpy.float64]) The Spearman correlation (rho, p) between the predictions and the gold labels.
         """
         if self.graded_task == {}:
-            logging.error('DWUG does not contain graded change scores; nothing to evaluate on.')
+            logger.error('DWUG does not contain graded change scores; nothing to evaluate on.')
             return
         
         if type(predictions) == list:
@@ -865,7 +866,7 @@ class WiC(Benchmark):
             # Pre-defined path
             else:
                 self.home_path = path
-            logging.info(f"WiC home path: {self.home_path}")
+            logger.info(f"WiC home path: {self.home_path}")
                 
             self.load_from_resource_hub(dataset, language, crosslingual = crosslingual)
 
@@ -874,7 +875,7 @@ class WiC(Benchmark):
             try:
                 self.load_from_data(wic_data)
             except Exception as e:
-                logging.error('Could not load from dataset.')
+                logger.error('Could not load from dataset.')
                 raise e
     
     # Loads from a list or a dict containing a WiC dataset, with each example as in self.load_from_resource_hub()
@@ -921,7 +922,7 @@ class WiC(Benchmark):
             try:
                 language_path = language_paths[language]
             except KeyError:
-                logging.error(f'Language {language} is not supported.')
+                logger.error(f'Language {language} is not supported.')
                 raise Exception
 
             # For English, train and dev sets are available, with both having labels.
@@ -964,7 +965,7 @@ class WiC(Benchmark):
 
             language_path = "data/" + language.lower()
             if not os.path.exists(os.path.join(self.home_path, language_path)):
-                logging.error(f'Path {os.path.join(self.home_path, language_path)} does not exist.')
+                logger.error(f'Path {os.path.join(self.home_path, language_path)} does not exist.')
                 raise FileNotFoundError
             
             for s in data_paths.keys():
@@ -1187,14 +1188,14 @@ class WiC(Benchmark):
 
         if word is not None:
             if not word in self.target_words:
-                logging.error(f'Word {word} was not found.')
+                logger.error(f'Word {word} was not found.')
                 raise ValueError
             dataset = filter(lambda d : d['word'] == word, dataset)
 
         if type(predictions) == dict and 'id' in predictions.keys():
             for d in dataset:
                 if not 'id' in d.keys():
-                    logging.error('Could not find id:s for all examples in the dataset.')
+                    logger.error('Could not find id:s for all examples in the dataset.')
                     raise KeyError
             pred = [predictions[ex['id']] for ex in dataset]
         else:
@@ -1204,7 +1205,7 @@ class WiC(Benchmark):
             stats = metric(truth, pred)
             return stats
         except:
-            logging.error(f'Could not use {metric} to compare the true and predicted labels.')
+            logger.error(f'Could not use {metric} to compare the true and predicted labels.')
     
     def evaluate_spearman(self, predictions : Union[List[Dict], Dict], dataset = 'test', word = None):
         return self.evaluate(predictions, dataset, spearmanr, word)
@@ -1254,7 +1255,7 @@ class WSD(Benchmark):
             else:
                 self.home_path = path
 
-            logging.info(f"WSD home path: {self.home_path}")
+            logger.info(f"WSD home path: {self.home_path}")
             self.load(dataset, language)
 
         # Loads from a dictionary or list already containing a WSD dataset
@@ -1262,7 +1263,7 @@ class WSD(Benchmark):
             try:
                 self.load_from_data(wsd_data)
             except Exception as e:
-                logging.error('Could not load from dataset.')
+                logger.error('Could not load from dataset.')
                 raise e
 
     # Loads from a dict or list containing a WSD dataset, with each example as in self.load()
@@ -1292,22 +1293,22 @@ class WSD(Benchmark):
                 data_paths['train']['data'] = f'training_datasets/semcor_{language.lower()}/semcor_{language.lower()}.data.xml'
                 data_paths['train']['labels'] = f'training_datasets/semcor_{language.lower()}/semcor_{language.lower()}.gold.key.txt'
             else:
-                logging.info(f'No train set found for {language}.')
+                logger.info(f'No train set found for {language}.')
             
             if os.path.exists(os.path.join(self.home_path, f'evaluation_datasets/dev-{language.lower()}')):
                 data_paths['dev']['data'] = f'evaluation_datasets/dev-{language.lower()}/dev-{language.lower()}.data.xml'
                 data_paths['dev']['labels'] = f'evaluation_datasets/dev-{language.lower()}/dev-{language.lower()}.gold.key.txt'
             else:
-                logging.info(f'No dev set found for {language}. Did you enter the right language code?')
+                logger.info(f'No dev set found for {language}. Did you enter the right language code?')
 
             if os.path.exists(os.path.join(self.home_path, f'evaluation_datasets/test-{language.lower()}')):
                 data_paths['test']['data'] = f'evaluation_datasets/test-{language.lower()}/test-{language.lower()}.data.xml'
                 data_paths['test']['labels'] = f'evaluation_datasets/test-{language.lower()}/test-{language.lower()}.gold.key.txt'
             else:
-                logging.info(f'No test set found for {language}. Did you enter the right language code?')
+                logger.info(f'No test set found for {language}. Did you enter the right language code?')
 
         else:
-            logging.info("No data was found.")
+            logger.info("No data was found.")
 
         return data_paths
     
@@ -1424,14 +1425,14 @@ class WSD(Benchmark):
 
         if word is not None:
             if not word in self.target_words:
-                logging.error(f'Word {word} was not found.')
+                logger.error(f'Word {word} was not found.')
                 raise ValueError
             dataset = filter(lambda d : d['word'] == word, dataset)
 
         if type(predictions) == dict and 'id' in predictions.keys():
             for d in dataset:
                 if not 'id' in d.keys():
-                    logging.error('Could not find id:s for all examples in the dataset.')
+                    logger.error('Could not find id:s for all examples in the dataset.')
                     raise KeyError
             pred = [predictions[ex['id']] for ex in dataset]
         else:
@@ -1444,13 +1445,13 @@ class WSD(Benchmark):
                 try:
                     metric = metric_names[metric]
                 except KeyError:
-                    logging.error(f'Could not use {metric} as a metric.')
+                    logger.error(f'Could not use {metric} as a metric.')
                     return
                 
             stats = metric(truth, pred)
             return stats
         except:
-            logging.error(f'Could not use {metric} to compare the true and predicted labels.')
+            logger.error(f'Could not use {metric} to compare the true and predicted labels.')
 
     def evaluate_accuracy(self, predictions : Union[List[Dict], Dict], dataset = 'test', word = None):
         return self.evaluate(predictions, dataset, accuracy_score, word)
@@ -1544,7 +1545,7 @@ class WSI(Benchmark):
                 try:
                     metric = metric_names[metric]
                 except KeyError:
-                    logging.error(f'{metric} does not define a metric.')
+                    logger.error(f'{metric} does not define a metric.')
                     continue
             metric_functions.add(metric)
 

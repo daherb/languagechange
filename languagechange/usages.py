@@ -10,7 +10,8 @@ from pathlib import Path
 from languagechange.utils import Time
 
 import languagechange.logging
-from languagechange.logging import logging
+
+logger = languagechange.logging.logging.getLogger(__name__)
 
 class POS(enum.Enum):
    NOUN = 1
@@ -107,7 +108,7 @@ class UsageDictionary(dict):
             words = set(words)
         words_not_present = words.difference(set(self.keys()))
         if len(words_not_present) != 0:
-            logging.info(f'Words {words_not_present} are not in the usage dictionary')
+            logger.info(f'Words {words_not_present} are not in the usage dictionary')
         
         for k in set(self.keys()).intersection(words):
             output_fn = f"{path}/{k}_usages.jsonl"
@@ -117,11 +118,11 @@ class UsageDictionary(dict):
                     tul[i] = {'text': tu['text_']} | tu # replace the 'text_' key with a 'text' key
                     tul[i].pop('text_')
                 writer.write_all(tul)
-                logging.info(f"Usages written to {output_fn}")
+                logger.info(f"Usages written to {output_fn}")
 
     def load(self, path, words = set()):
         if not os.path.exists(path):
-            logging.error(f'Path {path} does not exist.')
+            logger.error(f'Path {path} does not exist.')
             return None
         self.clear()
         words = set(words)
@@ -132,7 +133,7 @@ class UsageDictionary(dict):
                 if lemma in words or len(words) == 0:
                     with jsonlines.open(os.path.join(path, fn), 'r') as reader:
                         self[lemma] = TargetUsageList(TargetUsage(**tu) for tu in reader)
-                        logging.info(f"Loaded usages from {os.path.join(path, fn)}")
+                        logger.info(f"Loaded usages from {os.path.join(path, fn)}")
         not_loaded_words = words.difference(set(self.keys()))
         if len(not_loaded_words) != 0:
-            logging.info(f"Could not find usages for words {not_loaded_words}")
+            logger.info(f"Could not find usages for words {not_loaded_words}")

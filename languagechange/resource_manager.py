@@ -5,9 +5,8 @@ from pathlib import Path
 from platformdirs import user_cache_dir
 import dload
 import languagechange.logging
-from languagechange.logging import logging
 
-logger = logging.getLogger(__name__)
+logger = languagechange.logging.logging.getLogger(__name__)
 
 class LanguageChange():
 

@@ -143,7 +143,8 @@ class XL_LEXEME(ContextualizedModel):
 
     def __init__(self, pretrained_model: str = 'pierluigic/xl-lexeme',
                  device: str = 'cuda',
-                 n_extra_tokens: int = 0):
+                 n_extra_tokens: int = 0,
+                 cache_folder: str | None = None):
         """
         Initialize the XL_LEXEME model.
 
@@ -155,7 +156,7 @@ class XL_LEXEME(ContextualizedModel):
         logger.info("Initializing XL_LEXEME model.")
         super().__init__(device=device, n_extra_tokens=n_extra_tokens)
 
-        self._model = WordTransformer(pretrained_model, device=device)
+        self._model = WordTransformer(pretrained_model, device=device, cache_folder=cache_folder)
 
     def encode(self, target_usages: Union[TargetUsage, List[TargetUsage]],
                batch_size: int = 8) -> np.array:
